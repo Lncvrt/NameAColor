@@ -1,6 +1,6 @@
 <?php
-include __DIR__ . "/config/captcha.php";
-include __DIR__ . "/incl/db.php";
+include __DIR__ . "/../config/captcha.php";
+include __DIR__ . "/../incl/db.php";
 
 $hostname = hash('sha256', $_SERVER["HTTP_CF_CONNECTING_IP"]);
 
