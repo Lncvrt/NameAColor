@@ -1,0 +1,5 @@
+{
+    "require": {
+        "snipe/banbuilder": "^2.3"
+    }
+}
