@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Mar 08, 2025 at 06:43 AM
+-- Generation Time: Mar 08, 2025 at 05:27 PM
 -- Server version: 11.4.3-MariaDB-1
 -- PHP Version: 8.3.11
 
@@ -31,7 +31,8 @@ CREATE TABLE `colors` (
   `id` int(11) NOT NULL,
   `name` text NOT NULL,
   `color` char(6) NOT NULL,
-  `timestamp` int(11) NOT NULL
+  `timestamp` int(11) NOT NULL,
+  `hostname` char(64) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --

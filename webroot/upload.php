@@ -3,6 +3,7 @@ include __DIR__ . "/config/captcha.php";
 include __DIR__ . "/incl/db.php";
 
 $time = time();
+$hostname = hash('sha256', $_SERVER["HTTP_CF_CONNECTING_IP"]);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -66,10 +67,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $stmt = $conn->prepare("INSERT INTO colors (color, name, timestamp) VALUES (:color, :name, :time)");
+    $stmt = $conn->prepare("SELECT name FROM colors WHERE name = :name");
+    $stmt->bindParam(':name', $name);
+    $stmt->execute();
+
+    if ($stmt->rowCount() > 0) {
+        echo "Name already taken";
+        exit;
+    }
+
+    $stmt = $conn->prepare("INSERT INTO colors (color, name, timestamp, hostname) VALUES (:color, :name, :time, :hostname)");
     $stmt->bindParam(':color', $color);
     $stmt->bindParam(':name', $name);
     $stmt->bindParam(':time', $time);
+    $stmt->bindParam(':hostname', $hostname);
     $stmt->execute();
     $lastInsertId = $conn->lastInsertId();
     header("Location: /?highlight=$lastInsertId");

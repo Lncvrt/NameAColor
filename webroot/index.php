@@ -10,7 +10,7 @@ $stmt->execute();
 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 usort($result, function($a, $b) {
-    return strtotime($b['timestamp']) - strtotime($a['timestamp']);
+    return strcmp($b['timestamp'], $a['timestamp']);
 });
 
 $lastInsertId = $_GET['highlight'] ?? null;
@@ -47,6 +47,12 @@ $lastInsertId = $_GET['highlight'] ?? null;
             border: 2px solid #006eff
         }
 
+        .color {
+            width: 128px;
+            height: 128px;
+            border-radius: 5px;
+        }
+
         .used-text {
             display: none;
             color: red;
@@ -55,19 +61,36 @@ $lastInsertId = $_GET['highlight'] ?? null;
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const usedColors = <?= json_encode(array_column($result, 'color')) ?>;
+            const usedNames = <?= json_encode(array_column($result, 'name')) ?>;
             const colorInput = document.querySelector('.color-picker');
-            const element = document.querySelector('.used-text');
+            const nameInput = document.querySelector('.name-input');
+            const usedColorText = document.querySelector('.used-color');
+            const usedNameText = document.querySelector('.used-text');
+            const colorValue = document.querySelector('.color-value');
             const submit = document.querySelector('.submit-button');
             let captchaComplete = false;
 
             colorInput.value = '#<?= bin2hex(random_bytes(3)) ?>';
 
             const checkColor = () => {
+                colorValue.innerText = `Hex: ${colorInput.value}`;
                 if (usedColors.includes(colorInput.value.substr(1))) {
-                    element.style.display = 'block';
+                    usedColorText.style.display = 'block';
                     submit.disabled = true;
                 } else {
-                    element.style.display = 'none';
+                    usedColorText.style.display = 'none';
+                    if (captchaComplete) {
+                        submit.disabled = false;
+                    }
+                }
+            };
+
+            const checkName = () => {
+                if (usedNames.includes(btoa(nameInput.value))) {
+                    usedNameText.style.display = 'block';
+                    submit.disabled = true;
+                } else {
+                    usedNameText.style.display = 'none';
                     if (captchaComplete) {
                         submit.disabled = false;
                     }
@@ -85,7 +108,9 @@ $lastInsertId = $_GET['highlight'] ?? null;
             });
 
             colorInput.addEventListener('input', checkColor);
+            nameInput.addEventListener('input', checkName);
             checkColor();
+            checkName();
         });
     </script>
 </head>
@@ -94,11 +119,13 @@ $lastInsertId = $_GET['highlight'] ?? null;
     <hr>
     <h2>Name your own color!</h2>
     <form action="upload.php" method="post">
-        <p class="used-text">This color has already been named!</p>
+        <p class="used-color">This color has already been named!</p>
+        <p class="used-text">This name has already been used!</p>
         <label for="color">Color:</label>
         <input type="color" id="color" name="color" class="color-picker" required>
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" maxlength="50" required>
+        <input type="text" id="name" name="name" maxlength="50" class="name-input" required>
+        <label class="color-value"></label>
         <button type="submit" class="submit-button" disabled>Name it!</button>
         <div class="cf-turnstile"></div>
     </form>
@@ -106,9 +133,12 @@ $lastInsertId = $_GET['highlight'] ?? null;
     <h2>Colors that were named</h2>
     <?php
     foreach ($result as $row) {
-        echo "<div class=\"named-color" . ($lastInsertId != null && $lastInsertId == $row['id'] ? " highlight" : "") . "\">";
-        echo "<div style=\"width: 128px; height: 128px; background: #" . $row['color'] . ";\"></div>";
+        echo "<div class=\"named-color" . ($lastInsertId != null && $lastInsertId == $row['id'] && ($row['timestamp'] > time() - 10) ? " highlight" : "") . "\">";
+        echo "<div class=\"color\" style=\"background: #" . $row['color'] . ";\"></div>";
         echo "<p>" . htmlspecialchars(base64_decode($row['name'])) . " &bull; #". $row["color"] ."</p>";
+        if ($row['hostname'] == hash('sha256', $_SERVER["HTTP_CF_CONNECTING_IP"])) {
+            echo "<img src=\"assets/delete.svg\" alt=\"Delete\" style=\"cursor: pointer; width: 24px; height: 24px;\" onclick=\"window.location.href='delete.php?id=" . $row['id'] . "'\">";
+        }
         echo "</div>";
     }
     ?>
