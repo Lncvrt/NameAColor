@@ -9,13 +9,9 @@ $censor = new CensorWords();
 
 $conn = connectToDatabase();
 
-$stmt = $conn->prepare("SELECT * FROM colors");
+$stmt = $conn->prepare("SELECT * FROM colors ORDER BY timestamp DESC");
 $stmt->execute();
 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-usort($result, function($a, $b) {
-    return strcmp($b['timestamp'], $a['timestamp']);
-});
 
 $lastInsertId = $_GET['highlight'] ?? null;
 ?>
