@@ -2,9 +2,9 @@
 -- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3306
--- Generation Time: Mar 08, 2025 at 05:27 PM
--- Server version: 11.4.3-MariaDB-1
+-- Host: 127.0.0.1
+-- Generation Time: May 04, 2025 at 05:27 PM
+-- Server version: 11.4.5-MariaDB-0ubuntu0.24.10.1
 -- PHP Version: 8.3.11
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -31,13 +31,8 @@ CREATE TABLE `colors` (
   `id` int(11) NOT NULL,
   `name` text NOT NULL,
   `color` char(6) NOT NULL,
-  `timestamp` int(11) NOT NULL,
-  `hostname` char(64) DEFAULT NULL
+  `timestamp` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
-
---
--- Indexes for dumped tables
---
 
 --
 -- Indexes for table `colors`

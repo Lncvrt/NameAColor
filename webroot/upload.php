@@ -3,10 +3,8 @@ include __DIR__ . "/../config/captcha.php";
 include __DIR__ . "/../incl/db.php";
 
 $time = time();
-$hostname = hash('sha256', $_SERVER["HTTP_CF_CONNECTING_IP"]);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     $ip = $_SERVER["HTTP_CF_CONNECTING_IP"];
     $token = $_POST['cf-turnstile-response'] ?? '';
     $url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
@@ -76,11 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $stmt = $conn->prepare("INSERT INTO colors (color, name, timestamp, hostname) VALUES (:color, :name, :time, :hostname)");
+    $stmt = $conn->prepare("INSERT INTO colors (color, name, timestamp) VALUES (:color, :name, :time)");
     $stmt->bindParam(':color', $color);
     $stmt->bindParam(':name', $name);
     $stmt->bindParam(':time', $time);
-    $stmt->bindParam(':hostname', $hostname);
     $stmt->execute();
     $lastInsertId = $conn->lastInsertId();
     header("Location: /?highlight=$lastInsertId");

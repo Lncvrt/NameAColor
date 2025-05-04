@@ -1,11 +1,6 @@
 <?php
-require __DIR__ . '/../composer/vendor/autoload.php';
 include __DIR__ . "/../config/captcha.php";
 include __DIR__ . "/../incl/db.php";
-
-use Snipe\BanBuilder\CensorWords;
-
-$censor = new CensorWords();
 
 $conn = connectToDatabase();
 
@@ -135,7 +130,7 @@ $lastInsertId = $_GET['highlight'] ?? null;
     foreach ($result as $row) {
         echo "<div class=\"named-color" . ($lastInsertId != null && $lastInsertId == $row['id'] && ($row['timestamp'] > time() - 10) ? " highlight" : "") . "\">";
         echo "<div class=\"color\" style=\"background: #" . $row['color'] . ";\"></div>";
-        echo "<p>" . htmlspecialchars($censor->censorString(preg_replace('/[^a-zA-Z0-9\s\-\_]/', '', base64_decode($row['name'])))['clean']) . " &bull; #" . $row["color"] . "</p>";
+        echo "<p>" . htmlspecialchars(base64_decode($row['name'])) . " &bull; #" . $row["color"] . "</p>";
         echo "</div>";
     }
     ?>
